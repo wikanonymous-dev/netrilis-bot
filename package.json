@@ -1,0 +1,38 @@
+{
+  "name": "netrilis-bot",
+  "version": "1.0.0",
+  "description": "Netrilis telegram bot integration with gitlab hooks",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "nodemon -r tsconfig-paths/register src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/katon-labs/netrilis-bot.git"
+  },
+  "keywords": [
+    "netrilis-bot"
+  ],
+  "author": "naturaatom@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/katon-labs/netrilis-bot/issues"
+  },
+  "homepage": "https://github.com/katon-labs/netrilis-bot#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  }
+}
