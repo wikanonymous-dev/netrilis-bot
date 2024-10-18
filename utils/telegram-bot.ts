@@ -15,6 +15,7 @@ export interface JobTemplateData {
   sha_commit: string,
   ref: string,
   build_stage: string,
+  build_name: string,
   build_status: string,
   build_failed_reason: string,
   triggerer: string,
@@ -32,10 +33,11 @@ export function getMergeRequestTemplateText (data: MergeRequestTemplateData) {
 }
 
 export function getJobTemplateText (data: JobTemplateData) {
-  return `🟢 Pipeline Status
+  return `🟢 Build Status
   ${data.sha_commit}\n
   Ref: *${data.ref}*
   Stage: *${data.build_stage}*
+  Name: *${data.build_name}*
   Status: *${data.build_status}*
   Failed reason: *${data.build_failed_reason ?? '-'}*
   Trigger by: *${data.triggerer}*`

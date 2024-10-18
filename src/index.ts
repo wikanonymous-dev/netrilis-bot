@@ -64,6 +64,7 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
         sha_commit: String(body.sha),
         ref: String(body.ref),
         build_stage: String(body.build_stage),
+        build_name: String(body.build_name),
         build_status: buildStatus,
         build_failed_reason: body.status === 'failed' ? body.build_failure_reason : '',
         triggerer: String(body.user.username)
