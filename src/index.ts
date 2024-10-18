@@ -86,6 +86,10 @@ app.get('/ping', (req, res) => {
   })
 })
 
+app.get('/', (req, res) => {
+  res.send('Netrilis Bot')
+})
+
 app.get('*', (req, res) => {
   res.status(404).end()
 })

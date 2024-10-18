@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "yarn build",
   "builds": [
     {
       "src": "dist/src/index.js",
@@ -8,10 +7,10 @@
       "config": { "includeFiles": ["dist/**"] }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "dist/src/index.js"
+      "source": "/(.*)",
+      "destination": "dist/src/index.js"
     }
   ]
 }
