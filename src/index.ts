@@ -80,6 +80,16 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
   res.status(200).send('OK')
 })
 
+app.get('/ping', (req, res) => {
+  res.status(200).json({
+    message: 'Pong'
+  })
+})
+
+app.get('*', (req, res) => {
+  res.status(404).end()
+})
+
 app.listen(port, () => {
   console.log(`[server]: Server is running on port http://localhost:${port}`)
 })
