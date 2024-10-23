@@ -17,67 +17,51 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
     case 'Merge Request Hook':
       const mergeAction = body.object_attributes.action
 
-      if (!['open'].includes(mergeAction))
-        return
-
+      if (mergeAction === 'merge') {
         messageText = getMergeRequestTemplateText({
-          sha_commit: String(body.object_attributes.merge_commit_sha),
-          repository_url: String(body.project.web_url),
+          url: String(body.object_attributes.url),
           source_branch: String(body.object_attributes.source_branch),
           target_branch: String(body.object_attributes.target_branch),
           author: String(body.user.username),
           description: String(body.object_attributes.description)
         })
-
-      try {
-      await sendMessage(messageText)
-      } catch(error) {
-        console.error(error)
       }
       break;
 
-    case 'Job Hook':
-      if (!['running', 'success', 'failed'].includes(body.build_status))
-        return
+    case 'Pipeline Hook':
+      const isFailed = body.object_attributes.status === 'failed'
+      const isSuccess = body.object_attributes.status === 'success'
+      const isBuildSuccess = body.builds.at(0).status === 'success'
+      const isDeploySuccess = body.builds.at(-1).status === 'success'
 
-      let buildStatus = ''
-
-      switch (body.build_status) {
-        case 'running':
-          buildStatus = 'Running 🔄'
-          break;
-
-        case 'success':
-          buildStatus = 'Success ✅'
-          break;
-
-        case 'failed':
-          buildStatus = 'Failed ❌'
-          break;
-
-        default:
-          buildStatus = 'Running 🔄'
-          break;
+      if (isFailed) {
+        messageText = getJobTemplateText( '🚀 Deploy Failed', {
+          ref: String(body.ref),
+          url: String(body.object_attributes.url),
+          triggerer: String(body.user.username)
+        })
+      } else if (isSuccess && isBuildSuccess && isDeploySuccess) {
+        messageText = getJobTemplateText( '🚀 Deploy Success', {
+          ref: String(body.ref),
+          url: String(body.object_attributes.url),
+          triggerer: String(body.user.username)
+        })
       }
-
-      messageText = getJobTemplateText({
-        sha_commit: String(body.sha),
-        ref: String(body.ref),
-        build_stage: String(body.build_stage),
-        build_name: String(body.build_name),
-        build_status: buildStatus,
-        build_failed_reason: body.status === 'failed' ? body.build_failure_reason : '',
-        triggerer: String(body.user.username)
-      })
-
-      await sendMessage(messageText)
       break;
 
     default:
       break;
   }
 
-  res.status(200).send('OK')
+  try {
+    if (messageText) {
+      await sendMessage(messageText)
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    res.status(200).send('OK')
+  }
 })
 
 app.get('/ping', (req, res) => {

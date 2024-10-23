@@ -3,8 +3,7 @@ import { $axios } from './axios'
 export type MessageType = 'merge-request' | 'pipeline'
 
 export interface MergeRequestTemplateData {
-  sha_commit: string,
-  repository_url: string,
+  url: string,
   source_branch: string,
   target_branch: string,
   author: string,
@@ -12,34 +11,26 @@ export interface MergeRequestTemplateData {
 }
 
 export interface JobTemplateData {
-  sha_commit: string,
   ref: string,
-  build_stage: string,
-  build_name: string,
-  build_status: string,
-  build_failed_reason: string,
+  url: string,
   triggerer: string,
 }
 
 export function getMergeRequestTemplateText (data: MergeRequestTemplateData) {
   return `🟢 New Merge Request
-  ${data.sha_commit}\n
   Author: *${data.author}*
   Source branch: *${data.source_branch}*
   Target branch: *${data.target_branch}*
-  Repository: *${data.repository_url}*\n
+  URL: *${data.url}*
+  Status: *Merged*\n
   *Description*:
   ${data.description}`
 }
 
-export function getJobTemplateText (data: JobTemplateData) {
-  return `🟢 Build Status
-  ${data.sha_commit}\n
+export function getJobTemplateText (title: string, data: JobTemplateData) {
+  return `${title}
   Ref: *${data.ref}*
-  Stage: *${data.build_stage}*
-  Name: *${data.build_name}*
-  Status: *${data.build_status}*
-  Failed reason: *${data.build_failed_reason ?? '-'}*
+  URL: *${data.url}*
   Trigger by: *${data.triggerer}*`
 }
 
