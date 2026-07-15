@@ -3,6 +3,7 @@ import axios from 'axios'
 const API_BASE_URL = `${process.env.TELEGRAM_API_BASE_URL}/bot${process.env.TELEGRAM_BOT_TOKEN}`
 
 axios.defaults.baseURL = API_BASE_URL
+axios.defaults.timeout = 10000
 
 function getAxiosInstance() {
   return {

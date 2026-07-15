@@ -10,6 +10,7 @@ const gitlabAxios = axios.create({
     'PRIVATE-TOKEN': GITLAB_API_TOKEN,
     'Content-Type': 'application/json',
   },
+  timeout: 4000
 })
 
 function mapCiVariableToCollection (value: string) {

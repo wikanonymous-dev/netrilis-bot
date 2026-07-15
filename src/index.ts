@@ -71,18 +71,24 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
 app.post('/webhook/telegram', async (req: Request, res: Response) => {
   const update: TelegramUpdate = req.body
 
-  // Respond immediately — Telegram expects a fast 200 OK
-  res.status(200).json({
-    code: 200,
-    message: 'Success'
-  })
-
   try {
     if (update.message) {
       await handleCommand(update.message)
+
+    // Respond immediately — Telegram expects a fast 200 OK
+    res.status(200).json({
+      code: 200,
+      message: 'Success'
+    })
     }
   } catch (error) {
     console.error('Telegram webhook error:', error)
+
+    // Respond immediately — Telegram expects a fast 200 OK
+    res.status(200).json({
+      code: 200,
+      message: 'Failed webhook'
+    })
   }
 })
 
