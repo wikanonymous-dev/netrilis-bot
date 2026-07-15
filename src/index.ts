@@ -15,6 +15,7 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
   const body = req.body
 
   let messageText = ''
+  let topicWebhook = null
 
   switch (event) {
     case 'Merge Request Hook':
@@ -36,6 +37,10 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
       const isSuccess = body.object_attributes.status === 'success'
       const isBuildSuccess = body.builds.at(0).status === 'success'
       const isDeploySuccess = body.builds.at(-1).status === 'success'
+
+      const threadVariable = body.variables.find((v: { key: string; value: string }) => v.key === 'TELEGRAM_THREAD_ID')
+
+      if (threadVariable) topicWebhook = 'ops'
 
       if (isFailed) {
         messageText = getJobTemplateText( '🚀 Deploy Failed', {
@@ -59,6 +64,10 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
   try {
     if (messageText) {
       await sendMessage(messageText, 'cicd')
+
+      if (topicWebhook) {
+        await sendMessage(messageText, 'ops')
+      }
     }
   } catch (error) {
     console.error(error)
