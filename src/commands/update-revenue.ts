@@ -108,7 +108,8 @@ export async function handleConfirmDeploy(message: TelegramMessage) {
     }
 
     // just re-run the deployment job
-    const deploymentJob = jobs.find((item) => item.name === 'deploy-release-stable')
+    const jobName = MAINTENANCE_VAR_KEY === 'PRODUCTION_CONFIG_FE' ? 'deploy-release-stable' : 'deploy-release-develop'
+    const deploymentJob = jobs.find((item) => item.name === jobName)
 
     if (!deploymentJob) {
       await sendMessage(`❌ *Error*: No deployment job found for pipeline [#${pipeline.id}](${pipeline.web_url}).`, 'ops')
