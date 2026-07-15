@@ -79,7 +79,7 @@ app.post('/webhook/telegram', async (req: Request, res: Response) => {
 
   try {
     if (update.message) {
-      handleCommand(update.message)
+      await handleCommand(update.message)
     }
   } catch (error) {
     console.error('Telegram webhook error:', error)

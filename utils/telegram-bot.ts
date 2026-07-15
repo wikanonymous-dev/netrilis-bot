@@ -50,5 +50,7 @@ export function sendMessage(messageText: string, topic: TopicId = 'cicd', chatId
     parse_mode: 'Markdown'
   }
 
+  console.info('sendMessage', JSON.stringify(payload, null, 2))
+
   return $axios.post('sendMessage', payload)
 }
