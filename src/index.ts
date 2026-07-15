@@ -72,10 +72,15 @@ app.post('/webhook/telegram', async (req: Request, res: Response) => {
   const update: TelegramUpdate = req.body
 
   // Respond immediately — Telegram expects a fast 200 OK
-  res.status(200).send('OK')
+  res.status(200).json({
+    code: 200,
+    message: 'Success'
+  })
 
   try {
     if (update.message) {
+      console.info("MESSAGE", update.message)
+
       await handleCommand(update.message)
     }
   } catch (error) {
