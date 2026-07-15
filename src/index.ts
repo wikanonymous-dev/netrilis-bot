@@ -79,8 +79,6 @@ app.post('/webhook/telegram', async (req: Request, res: Response) => {
 
   try {
     if (update.message) {
-      console.info("MESSAGE", update.message)
-
       await handleCommand(update.message)
     }
   } catch (error) {

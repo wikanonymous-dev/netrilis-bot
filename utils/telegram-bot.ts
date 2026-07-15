@@ -43,10 +43,13 @@ export function getJobTemplateText (title: string, data: JobTemplateData) {
 
 export function sendMessage(messageText: string, topic: TopicId = 'cicd', chatId?: string) {
   const threadId = THREAD_ID_MAP[topic]
-  return $axios.post('sendMessage', {
+  const payload = {
     chat_id: chatId ?? process.env.TELEGRAM_NETRILIS_CHAT_ID,
     message_thread_id: threadId ?? undefined,
     text: messageText,
     parse_mode: 'Markdown'
-  })
+  }
+
+  console.log('PAYLOAD', payload)
+  return $axios.post('sendMessage', payload)
 }
