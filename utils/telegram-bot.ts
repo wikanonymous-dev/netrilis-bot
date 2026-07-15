@@ -2,6 +2,13 @@ import { $axios } from './axios'
 
 export type MessageType = 'merge-request' | 'pipeline'
 
+export type TopicId = 'cicd' | 'ops'
+
+const THREAD_ID_MAP: Record<TopicId, string | undefined> = {
+  cicd: process.env.TELEGRAM_THREAD_ID_CICD,
+  ops: process.env.TELEGRAM_THREAD_ID_OPS,
+}
+
 export interface MergeRequestTemplateData {
   url: string,
   source_branch: string,
@@ -17,7 +24,7 @@ export interface JobTemplateData {
 }
 
 export function getMergeRequestTemplateText (data: MergeRequestTemplateData) {
-  return `🟢 New Merge Request
+  return `🟢 New Merge Request\n
   Author: *${data.author}*
   Source branch: *${data.source_branch}*
   Target branch: *${data.target_branch}*
@@ -28,16 +35,17 @@ export function getMergeRequestTemplateText (data: MergeRequestTemplateData) {
 }
 
 export function getJobTemplateText (title: string, data: JobTemplateData) {
-  return `${title}
+  return `${title}\n
   Ref: *${data.ref}*
   URL: *${data.url}*
   Trigger by: *${data.triggerer}*`
 }
 
-export function sendMessage(messageText: string, chatId?: string) {
+export function sendMessage(messageText: string, topic: TopicId = 'cicd', chatId?: string) {
+  const threadId = THREAD_ID_MAP[topic]
   return $axios.post('sendMessage', {
     chat_id: chatId ?? process.env.TELEGRAM_NETRILIS_CHAT_ID,
-    message_thread_id: process.env.TELEGRAM_NETRILIS_MESSAGE_THREAD_ID ?? undefined,
+    message_thread_id: threadId ?? undefined,
     text: messageText,
     parse_mode: 'Markdown'
   })

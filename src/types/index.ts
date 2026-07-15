@@ -237,3 +237,34 @@ export interface Reviewer {
   username: string
   avatar_url: string
 }
+
+// Telegram Webhook Types
+
+export interface TelegramUser {
+  id: number
+  is_bot: boolean
+  first_name: string
+  last_name?: string
+  username?: string
+}
+
+export interface TelegramChat {
+  id: number
+  type: string
+  title?: string
+  is_forum?: boolean
+}
+
+export interface TelegramMessage {
+  message_id: number
+  from?: TelegramUser
+  chat: TelegramChat
+  date: number
+  message_thread_id?: number
+  text?: string
+}
+
+export interface TelegramUpdate {
+  update_id: number
+  message?: TelegramMessage
+}

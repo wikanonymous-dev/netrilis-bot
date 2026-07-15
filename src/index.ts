@@ -1,12 +1,15 @@
 import express, { Express, Request, Response } from 'express'
 import 'dotenv/config'
 import { getMergeRequestTemplateText, getJobTemplateText, sendMessage } from '../utils/telegram-bot'
+import { handleCommand } from './commands'
+import { TelegramUpdate } from './types'
 
 const app: Express = express()
 const port = process.env.PORT || 3000
 
 app.use(express.json())
 
+// GitLab webhook — sends notifications to the CICD topic
 app.post('/webhook/gitlab', async (req: Request, res: Response) => {
   const event = req.header('X-Gitlab-Event')
   const body = req.body
@@ -36,13 +39,13 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
 
       if (isFailed) {
         messageText = getJobTemplateText( '🚀 Deploy Failed', {
-          ref: String(body.ref),
+          ref: String(body.object_attributes.ref),
           url: String(body.object_attributes.url),
           triggerer: String(body.user.username)
         })
       } else if (isSuccess && isBuildSuccess && isDeploySuccess) {
         messageText = getJobTemplateText( '🚀 Deploy Success', {
-          ref: String(body.ref),
+          ref: String(body.object_attributes.ref),
           url: String(body.object_attributes.url),
           triggerer: String(body.user.username)
         })
@@ -55,12 +58,28 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
 
   try {
     if (messageText) {
-      await sendMessage(messageText)
+      await sendMessage(messageText, 'cicd')
     }
   } catch (error) {
     console.error(error)
   } finally {
     res.status(200).send('OK')
+  }
+})
+
+// Telegram webhook — handles bot commands, sends responses to the OPS topic
+app.post('/webhook/telegram', async (req: Request, res: Response) => {
+  const update: TelegramUpdate = req.body
+
+  // Respond immediately — Telegram expects a fast 200 OK
+  res.status(200).send('OK')
+
+  try {
+    if (update.message) {
+      await handleCommand(update.message)
+    }
+  } catch (error) {
+    console.error('Telegram webhook error:', error)
   }
 })
 
@@ -81,3 +100,4 @@ app.get('*', (req, res) => {
 app.listen(port, () => {
   console.log(`[server]: Server is running on port http://localhost:${port}`)
 })
+
