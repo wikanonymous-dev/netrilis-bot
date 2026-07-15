@@ -28,7 +28,7 @@ export async function handleStart(message: TelegramMessage) {
 
   if (isAuthorized(userId)) {
     await sendMessage(
-      `✅ *Authorized*\n\nWelcome, @${username}! (ID: \`${userId}\`)\n\nAvailable commands:\n/start\\_update\\_revenue — Disable maintenance & deploy\n/stop\\_update\\_revenue — Enable maintenance & revert`,
+      `✅ *Authorized*\n\nWelcome, @${username}! (ID: \`${userId}\`)\n\nAvailable commands:\n/start\\_update\\_revenue — Enable maintenance & deploy for update revenue\n/stop\\_update\\_revenue — Disable maintenance & revert\n/start\\_banner\\_revenue — Enable maintenance & deploy for banner revenue information`,
       'ops'
     )
   } else {

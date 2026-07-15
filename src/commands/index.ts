@@ -1,6 +1,7 @@
 import { TelegramMessage } from '../types'
 import { sendMessage } from '../../utils/telegram-bot'
 import { handleStart } from './start'
+import { handleHelp } from './help'
 import { handleStartUpdateRevenue, handleStopUpdateRevenue, handleConfirmDeploy, handleStartBannerRevenue } from './update-revenue'
 
 /**
@@ -16,6 +17,10 @@ export async function handleCommand(message: TelegramMessage): Promise<boolean> 
   switch (command) {
     case '/start':
       await handleStart(message)
+      return true
+
+    case '/help':
+      await handleHelp(message)
       return true
 
     case '/start_update_revenue':
