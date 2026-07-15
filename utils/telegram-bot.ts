@@ -4,7 +4,7 @@ export type MessageType = 'merge-request' | 'pipeline'
 
 export type TopicId = 'cicd' | 'ops'
 
-const THREAD_ID_MAP: Record<TopicId, string | undefined> = {
+export const THREAD_ID_MAP: Record<TopicId, string | undefined> = {
   cicd: process.env.TELEGRAM_THREAD_ID_CICD,
   ops: process.env.TELEGRAM_THREAD_ID_OPS,
 }

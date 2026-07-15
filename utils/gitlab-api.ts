@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { THREAD_ID_MAP } from './telegram-bot'
 
 const GITLAB_API_URL = process.env.GITLAB_API_URL || 'https://gitlab.com/api/v4'
 const GITLAB_API_TOKEN = process.env.GITLAB_API_TOKEN || ''
@@ -118,7 +119,9 @@ export async function retryPipeline(pipelineId: number, projectId?: string) {
  * Run a job.
  */
 export async function runJob(jobId: number, projectId?: string) {
+  const threadId = THREAD_ID_MAP['ops']
+
   const pid = encodeURIComponent(projectId ?? GITLAB_PROJECT_ID)
-  const res = await gitlabAxios.post(`/projects/${pid}/jobs/${jobId}/play`)
+  const res = await gitlabAxios.post(`/projects/${pid}/jobs/${jobId}/play`, { job_variables_attributes: [ { key: 'TELEGRAM_THREAD_ID', value: threadId?.toString() } ] })
   return res.data as { id: number; status: string; web_url: string }
 }
