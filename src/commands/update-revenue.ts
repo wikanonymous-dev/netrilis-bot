@@ -225,7 +225,7 @@ export async function handleStartBannerRevenue(message: TelegramMessage, revenue
 
     // 2. Update variable
     const newVar = [...currentVar]
-    newVar[bannerSlugIndex].value = 'revenue_update'
+    newVar[bannerSlugIndex].value = 'revenue-update'
     newVar[bannerRevenueTimeIndex].value = revenueTime
 
     const newVarStringValue = newVar.map((item) => `${item.key}=${item.value}`).join('\n')
