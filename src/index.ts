@@ -55,7 +55,7 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
         break;
 
       case 'Job Hook':
-        if (body.object_kind === 'build') {
+        if (body.object_kind === 'build' && ['deploy-release-develop', 'deploy-release-stable'].includes(body.build_name)) {
           const jobId = body.build_id
           const tag = body.ref
           const jobName = body.build_name
