@@ -32,8 +32,10 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "@vercel/blob": "^2.6.1",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "express": "^4.21.1"
-  }
+  },
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
