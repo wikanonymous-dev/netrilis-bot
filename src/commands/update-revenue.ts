@@ -34,16 +34,27 @@ export async function handleStartUpdateRevenue(message: TelegramMessage) {
     const currentVar = await getCiVariable(MAINTENANCE_VAR_KEY)
     // Get IS_UNDER_MAINTENANCE variable
     const isUnderMaintenanceIndex = currentVar.findIndex((item) => item.key === 'IS_UNDER_MAINTENANCE')
+    const isUnderMaintenanceRouteIndex = currentVar.findIndex((item) => item.key === 'UNDER_MAINTENANCE_ROUTE_NAME')
+
     if (isUnderMaintenanceIndex < 0) {
       await sendMessage('❌ *Error*: \`IS_UNDER_MAINTENANCE\` variable not found.', 'ops')
       return
     }
 
+    if (isUnderMaintenanceRouteIndex < 0) {
+      await sendMessage('❌ *Error*: \`UNDER_MAINTENANCE_ROUTE_NAME\` variable not found.', 'ops')
+      return
+    }
+
     await sendMessage(`ℹ️ Current \`${currentVar[isUnderMaintenanceIndex].key}\`: \`${currentVar[isUnderMaintenanceIndex].value}\``, 'ops')
+    await sendMessage(`ℹ️ Current \`${currentVar[isUnderMaintenanceRouteIndex].key}\`: \`${currentVar[isUnderMaintenanceRouteIndex].value}\``, 'ops')
 
     // 2. Enable maintenance mode for update revenue
     const newVar = [...currentVar]
+    const underMaintenanceRouteNames = ["home-revenue-digital","home-revenue-youtube","home-withdrawal-request","home-withdrawal-transaction"]
+
     newVar[isUnderMaintenanceIndex].value = 'true'
+    newVar[isUnderMaintenanceRouteIndex].value = JSON.stringify(underMaintenanceRouteNames)
 
     const newVarStringValue = newVar.map((item) => `${item.key}=${item.value}`).join('\n')
     await updateCiVariable(MAINTENANCE_VAR_KEY, newVarStringValue)
