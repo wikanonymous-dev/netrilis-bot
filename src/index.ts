@@ -3,9 +3,7 @@ import 'dotenv/config'
 import { getMergeRequestTemplateText, getJobTemplateText, sendMessage } from '../utils/telegram-bot'
 import { handleCommand } from './commands'
 import { TelegramUpdate } from './types'
-import { access, rm } from 'fs/promises'
-import path from 'path'
-import { F_OK } from 'constants'
+import { removeArtifact } from '../utils/vercel-blob'
 
 const app: Express = express()
 const port = process.env.PORT || 3000
@@ -68,14 +66,13 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
         const jobName = body.build_name
         const status = body.build_status
 
-        const artifactPath = path.resolve(process.cwd(), 'artifact', `job-${jobId}-attributes.json`)
-        access(artifactPath, F_OK)
+        const artifactPath = `artifact/job-${jobId}-attributes.json`
+        removeArtifact(artifactPath)
           .then(async () => {
             topicWebhook = 'ops'
             topicMessage = `🚀 *Job re-triggered*\n\nTag: \`${tag}\`\nJob: \`${jobName}\`\nStatus: \`${status}\``
 
-            console.info('✅ Job artifact file exists at:', artifactPath);
-            await rm(artifactPath)
+            console.info('✅ Job artifact file removed at:', artifactPath);
           })
           .catch((error) => {
             if (error.code === 'ENOENT') {
