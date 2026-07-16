@@ -135,5 +135,7 @@ export async function runJob(jobId: number, projectId?: string) {
   await saveArtifact(artifactPath, jobAttributes)
 
   const res = await gitlabAxios.post(`/projects/${pid}/jobs/${jobId}/play`)
+  console.info('✅ Job artifact file saved at:', artifactPath);
+
   return res.data as { id: number; status: string; web_url: string }
 }

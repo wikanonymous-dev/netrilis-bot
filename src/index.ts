@@ -61,10 +61,18 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
           const jobName = body.build_name
           const status = body.build_status
 
+          let topicMessage = ''
+
+          if (status !== 'success') {
+              topicMessage = `🚀 *Job ${status}*\n\nTag: \`${tag}\`\nJob: \`${jobName}\`\nStatus: \`${status}\``
+
+              await sendMessage(topicMessage, 'ops')
+          }
+
           const artifactPath = `artifact/job-${jobId}-attributes.json`
           removeArtifact(artifactPath)
             .then(async () => {
-              const topicMessage = `🚀 *Job re-triggered*\n\nTag: \`${tag}\`\nJob: \`${jobName}\`\nStatus: \`${status}\``
+              topicMessage = `🚀 *Job ${status}*\n\nTag: \`${tag}\`\nJob: \`${jobName}\`\nStatus: \`${status}\``
 
               console.info('✅ Job artifact file removed at:', artifactPath);
 
