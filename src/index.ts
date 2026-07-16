@@ -3,6 +3,9 @@ import 'dotenv/config'
 import { getMergeRequestTemplateText, getJobTemplateText, sendMessage } from '../utils/telegram-bot'
 import { handleCommand } from './commands'
 import { TelegramUpdate } from './types'
+import { access, rm } from 'fs/promises'
+import path from 'path'
+import { F_OK } from 'constants'
 
 const app: Express = express()
 const port = process.env.PORT || 3000
@@ -16,6 +19,7 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
 
   let messageText = ''
   let topicWebhook = null
+  let topicMessage = ''
 
   switch (event) {
     case 'Merge Request Hook':
@@ -57,6 +61,35 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
       }
       break;
 
+    case 'Job Hook':
+      if (body.object_kind === 'build') {
+        const jobId = body.build_id
+        const tag = body.ref
+        const jobName = body.build_name
+        const status = body.build_status
+
+        const artifactPath = path.resolve(process.cwd(), 'artifact', `job-${jobId}-attributes.json`)
+        access(artifactPath, F_OK)
+          .then(async () => {
+            topicWebhook = 'ops'
+            topicMessage = `🚀 *Job re-triggered*\n\nTag: \`${tag}\`\nJob: \`${jobName}\`\nStatus: \`${status}\``
+
+            console.info('✅ Job artifact file exists at:', artifactPath);
+            await rm(artifactPath)
+          })
+          .catch((error) => {
+            if (error.code === 'ENOENT') {
+              console.info('ℹ️ Job artifact file does not exist. No cleanup needed.');
+            } else {
+              console.error('❌ An unexpected error occurred:', error.message);
+            }
+
+            topicWebhook = null
+          })
+      }
+
+      break;
+
     default:
       break;
   }
@@ -66,7 +99,7 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
       await sendMessage(messageText, 'cicd')
 
       if (topicWebhook) {
-        await sendMessage(messageText, 'ops')
+        await sendMessage(topicMessage, 'ops')
       }
     }
   } catch (error) {

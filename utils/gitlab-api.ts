@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { writeFile } from 'fs/promises'
+import path from 'path'
 import { THREAD_ID_MAP } from './telegram-bot'
 
 const GITLAB_API_URL = process.env.GITLAB_API_URL || 'https://gitlab.com/api/v4'
@@ -122,6 +124,16 @@ export async function runJob(jobId: number, projectId?: string) {
   const threadId = THREAD_ID_MAP['ops']
 
   const pid = encodeURIComponent(projectId ?? GITLAB_PROJECT_ID)
-  const res = await gitlabAxios.post(`/projects/${pid}/jobs/${jobId}/play`, { job_variables_attributes: [ { key: 'TELEGRAM_THREAD_ID', value: threadId?.toString() } ] })
+
+  const jobAttributes = JSON.stringify({
+    key: 'TELEGRAM_THREAD_ID',
+    value: threadId,
+  })
+
+  const artifactPath = path.resolve(process.cwd(), 'artifact', `job-${jobId}-attributes.json`)
+  console.log(`Writing artifact to ${artifactPath}`)
+  await writeFile(artifactPath, jobAttributes)
+
+  const res = await gitlabAxios.post(`/projects/${pid}/jobs/${jobId}/play`)
   return res.data as { id: number; status: string; web_url: string }
 }
