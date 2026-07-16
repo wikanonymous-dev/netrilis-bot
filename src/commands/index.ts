@@ -13,6 +13,10 @@ export async function handleCommand(message: TelegramMessage) {
   // Extract command (strip @botname if present, e.g. /start@MyBot → /start)
   const command = text.split(/[\s@]/)[0].toLowerCase()
 
+  if (!command.startsWith('/')) {
+    return
+  }
+
   switch (command) {
     case '/start':
       await handleStart(message)
