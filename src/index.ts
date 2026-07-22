@@ -3,7 +3,7 @@ import 'dotenv/config'
 import { getMergeRequestTemplateText, getJobTemplateText, sendMessage } from '../utils/telegram-bot'
 import { handleCommand } from './commands'
 import { TelegramUpdate } from './types'
-import { removeArtifact } from '../utils/vercel-blob'
+import { checkArtifact, removeArtifact } from '../utils/vercel-blob'
 
 const app: Express = express()
 const port = process.env.PORT || 3000
@@ -61,7 +61,22 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
           const jobName = body.build_name
           const status = body.build_status
 
+          const artifactPath = `artifact/job-${jobId}-attributes.json`
+
           let topicMessage = ''
+
+          let hasArtifact = false
+
+          checkArtifact(artifactPath)
+            .then(() => {
+              hasArtifact = true
+            })
+            .catch(() => {
+              hasArtifact = false
+            })
+          
+          if (!hasArtifact)
+            return
 
           if (status !== 'success') {
               topicMessage = `🚀 *Job ${status}*\n\nTag: \`${tag}\`\nJob: \`${jobName}\`\nStatus: \`${status}\``
@@ -69,7 +84,6 @@ app.post('/webhook/gitlab', async (req: Request, res: Response) => {
               await sendMessage(topicMessage, 'ops')
           }
 
-          const artifactPath = `artifact/job-${jobId}-attributes.json`
           removeArtifact(artifactPath)
             .then(async () => {
               topicMessage = `🚀 *Job ${status}*\n\nTag: \`${tag}\`\nJob: \`${jobName}\`\nStatus: \`${status}\``

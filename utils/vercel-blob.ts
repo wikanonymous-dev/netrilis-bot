@@ -1,4 +1,4 @@
-import { del, put } from '@vercel/blob'
+import { head, del, put } from '@vercel/blob'
 
 /**
  * Uploads a text/JSON string directly to Vercel Blob.
@@ -19,6 +19,14 @@ export async function saveArtifact (pathname: string, data: string) {
 export async function removeArtifact (pathname: string) {
     try {
         await del(pathname)
+    } catch (error) {
+        throw error
+    }
+}
+
+export async function checkArtifact (pathname: string) {
+    try {
+        await head(pathname)
     } catch (error) {
         throw error
     }
